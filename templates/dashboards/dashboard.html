@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static ui_extras %}
+{% block title %}Dashboard{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+{% block content %}
+
+  <div class="dashboard-topbar">
+    <div class="dashboard-heading">
+      <h1>Dashboard</h1>
+      <p>Overview of room utilisation and booking activities.</p>
+    </div>
+    <form class="dashboard-scope-form" method="get" action="." aria-label="Dashboard scope selector">
+      <label for="scope-select">View scope</label>
+      <select id="scope-select" name="scope" class="scope-select" onchange="this.form.submit()">
+        {% for key in available_scopes %}
+          <option value="{{ key }}" {% if scope.key == key %}selected{% endif %}>
+            {% if key == 'dept' %}My Department{% elif key == 'fac' %}My Faculty{% else %}University-wide{% endif %}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  <div class="dashboard-stat-row">
+    <div class="stat stat-total">
+      <div><div class="s-lbl">Total Rooms</div><div class="s-num">{{ stats.total }}</div>
+        <div class="s-sub">{{ scope.label }}</div></div>
+    </div>
+    <div class="stat stat-available">
+      <div><div class="s-lbl">Available Now</div><div class="s-num">{{ stats.available }}</div>
+        <div class="s-sub">{{ stats.available|pct:stats.total }}% of rooms</div></div>
+    </div>
+    <div class="stat stat-in-use">
+      <div><div class="s-lbl">In Use</div><div class="s-num">{{ stats.in_use }}</div>
+        <div class="s-sub">{{ stats.in_use|pct:stats.total }}% of rooms</div></div>
+    </div>
+    <div class="stat stat-booked">
+      <div><div class="s-lbl">Booked</div><div class="s-num">{{ stats.booked }}</div>
+        <div class="s-sub">{{ stats.booked|pct:stats.total }}% of rooms</div></div>
+    </div>
+    <div class="stat stat-unavailable">
+      <div><div class="s-lbl">Unavailable</div><div class="s-num">{{ stats.unavailable }}</div>
+        <div class="s-sub">{{ stats.unavailable|pct:stats.total }}% of rooms</div></div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    {# ── Utilisation donut ── #}
+    <div class="card">
+      <div class="card-h"><h3>Room Utilisation Overview</h3>
+        <span class="hint">{{ scope.label }}</span></div>
+      <div class="card-b" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center">
+        <div style="position:relative;width:190px;height:190px">
+          <canvas id="utilChart" width="190" height="190"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+            <div style="font-size:28px;font-weight:800">{{ stats.utilisation }}%</div>
+            <div style="font-size:11px;color:var(--muted)">Utilisation</div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:2">
+          <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F59E0B"></span> In use — <strong>{{ stats.in_use }}</strong></div>
+          <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8B5CF6"></span> Booked — <strong>{{ stats.booked }}</strong></div>
+          <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#16A34A"></span> Available — <strong>{{ stats.available }}</strong></div>
+          <div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#EF4444"></span> Unavailable — <strong>{{ stats.unavailable }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Upcoming bookings ── #}
+    <div class="card">
+      <div class="card-h"><h3>Upcoming Bookings</h3>
+        <a class="link" href="{% url 'bookings:calendar' %}">View calendar</a></div>
+      <table>
+        <tbody>
+          {% for b in upcoming %}
+          <tr>
+            <td style="width:70px"><strong>{{ b.date|date:"M j" }}</strong><br>
+              <span style="color:var(--muted);font-size:11.5px">{{ b.start_time|time:"H:i" }}</span></td>
+            <td><strong>{{ b.get_purpose_display }}</strong><br>
+              <span style="color:var(--muted);font-size:12px">{{ b.room.name }}</span></td>
+            <td>{% status_pill b.status b.get_status_display %}</td>
+          </tr>
+          {% empty %}
+          <tr><td><div class="empty" style="padding:20px;color:var(--muted)">No upcoming bookings in this scope.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    {# ── Rooms by type ── #}
+    <div class="card">
+      <div class="card-h"><h3>Rooms by Type</h3>
+        <a class="link" href="{% url 'rooms:inventory' %}">View all</a></div>
+      <table>
+        <thead><tr><th>Type</th><th>Rooms</th><th>Capacity</th><th>Utilisation</th></tr></thead>
+        <tbody>
+          {% for row in by_type %}
+          <tr>
+            <td><strong>{{ row.label }}</strong></td>
+            <td class="num">{{ row.rooms }}</td>
+            <td class="num">{{ row.capacity }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:9px">
+                <div class="bar-track"><div class="bar-fill" style="width:{{ row.utilisation }}%"></div></div>
+                <span style="font-weight:700;font-size:12px">{{ row.utilisation }}%</span>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4"><div class="empty" style="padding:20px;color:var(--muted)">No rooms in this scope.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# ── Pending requests ── #}
+    <div class="card">
+      <div class="card-h"><h3>Booking Requests Awaiting Approval</h3>
+        <a class="link" href="{% url 'approvals:pending' %}">{% if pending_total > pending|length %}Review all {{ pending_total }}{% else %}Review{% endif %}</a></div>
+      <table>
+        <tbody>
+          {% for b in pending %}
+          <tr>
+            <td><strong>{{ b.room.name }}</strong> — {{ b.get_purpose_display }}<br>
+              <span style="color:var(--muted);font-size:12px">{{ b.requester_name }} · {{ b.date|date:"j M" }}, {{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</span></td>
+            <td>{% status_pill b.status b.get_status_display %}</td>
+          </tr>
+          {% empty %}
+          <tr><td><div class="empty" style="padding:20px;color:var(--muted)">No requests awaiting approval.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/chart.min.js' %}"></script>
+<script>
+  new Chart(document.getElementById('utilChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['In use', 'Booked', 'Available', 'Unavailable'],
+      datasets: [{
+        data: [{{ stats.in_use }}, {{ stats.booked }}, {{ stats.available }}, {{ stats.unavailable }}],
+        backgroundColor: ['#F59E0B', '#8B5CF6', '#16A34A', '#EF4444'],
+        borderWidth: 0
+      }]
+    },
+    options: { cutout: '68%', plugins: { legend: { display: false } } }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+  <div class="card" style="max-width:520px">
+    <div class="card-h"><h3>My Profile</h3></div>
+    <div class="card-b">
+      <div class="spec-grid">
+        <div class="spec"><div class="sk">Username</div><div class="sv">{{ profile_user.username }}</div></div>
+        <div class="spec"><div class="sk">Full name</div><div class="sv">{{ profile_user.full_name|default:"—" }}</div></div>
+        <div class="spec"><div class="sk">Email</div><div class="sv">{{ profile_user.email|default:"—" }}</div></div>
+        <div class="spec"><div class="sk">Role</div><div class="sv">{{ profile_user.get_role_display }}</div></div>
+        <div class="spec"><div class="sk">Department</div><div class="sv">{{ profile_user.department|default:"—" }}</div></div>
+        <div class="spec"><div class="sk">Faculty</div><div class="sv">{{ profile_user.faculty|default:"—" }}</div></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

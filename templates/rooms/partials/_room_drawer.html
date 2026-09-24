@@ -1,0 +1,47 @@
+{% load ui_extras %}
+<div class="drawer-backdrop"></div>
+<div class="drawer">
+  <div class="d-head">
+    <button data-close style="float:right;background:rgba(255,255,255,.15);color:#fff;border:0;width:30px;height:30px;border-radius:8px;cursor:pointer">✕</button>
+    <div class="code">{{ room.code }}</div>
+    <h3>{{ room.name }}</h3>
+    <div style="font-size:12.5px;color:#AAB8D8;margin-top:2px">{{ room.building.name }} · {{ room.department.name }}</div>
+  </div>
+  <div class="d-body">
+    {% if room.photo %}
+      <a href="{{ room.photo.url }}" target="_blank" rel="noopener">
+        <img src="{{ room.photo.url }}" alt="Photo of {{ room.name }}" class="room-photo">
+      </a>
+    {% endif %}
+    <div class="spec-grid">
+      <div class="spec"><div class="sk">Type</div><div class="sv">{{ room.room_type.name }}</div></div>
+      <div class="spec"><div class="sk">Capacity</div><div class="sv">{{ room.capacity }}</div></div>
+      <div class="spec"><div class="sk">Floor</div><div class="sv">{{ room.floor.name }}</div></div>
+      <div class="spec"><div class="sk">Condition</div><div class="sv">{{ room.condition }}</div></div>
+      <div class="spec"><div class="sk">Accessibility</div><div class="sv">{{ room.accessibility|default:"—" }}</div></div>
+      <div class="spec"><div class="sk">Faculty</div><div class="sv">{{ room.department.faculty.name }}</div></div>
+      <div class="spec"><div class="sk">Status</div><div class="sv">{% status_pill room.status room.get_status_display %}</div></div>
+    </div>
+
+    <div style="font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:16px 0 9px;padding-top:14px;border-top:1px solid var(--line)">Suitable for</div>
+    <div>
+      {% for tag in room.suitability.all %}{% suit_tag tag.name %}{% empty %}<span style="color:var(--muted);font-size:12.5px">Not tagged</span>{% endfor %}
+    </div>
+
+    <div style="font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:16px 0 9px;padding-top:14px;border-top:1px solid var(--line)">Equipment</div>
+    <div>
+      {% for e in room.equipment.all %}<span class="cap-tag" style="margin-right:5px">{{ e.name }}</span>{% empty %}<span style="color:var(--muted);font-size:12.5px">None recorded</span>{% endfor %}
+    </div>
+
+    <div style="font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:16px 0 9px;padding-top:14px;border-top:1px solid var(--line)">Update usage status</div>
+    {% if can_edit %}
+      <form method="post" action="{% url 'rooms:update_status' room.pk %}" style="display:flex;gap:8px">
+        {% csrf_token %}
+        {{ status_form.status }}
+        <button class="btn btn-primary btn-sm" type="submit">Update</button>
+      </form>
+    {% else %}
+      <div class="locked-note">🔒 This room is outside your scope — status is read-only for you.</div>
+    {% endif %}
+  </div>
+</div>

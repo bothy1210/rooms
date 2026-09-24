@@ -1,0 +1,22 @@
+# ============================================================
+# Cron schedule — UZ Room System scheduled jobs
+# Install to: /etc/cron.d/roomsys   (owner root, mode 644)
+# Each line runs a Django management command as the roomsys user.
+# ============================================================
+SHELL=/bin/bash
+PATH=/usr/bin:/bin
+
+# Every 5 minutes: free rooms whose booking has ended, and close off past bookings.
+*/5 * * * *   roomsys  cd /opt/roomsys && /opt/roomsys/venv/bin/python manage.py refresh_room_status >> /var/log/roomsys/cron.log 2>&1
+
+# Every 15 minutes: send upcoming-booking reminders.
+*/15 * * * *  roomsys  cd /opt/roomsys && /opt/roomsys/venv/bin/python manage.py send_reminders >> /var/log/roomsys/cron.log 2>&1
+
+# Daily at 07:00: nudge offices with bookings still awaiting approval.
+0 7 * * *     roomsys  cd /opt/roomsys && /opt/roomsys/venv/bin/python manage.py nudge_pending_approvals >> /var/log/roomsys/cron.log 2>&1
+
+# Annually on 1 August at 02:00: open the yearly room census.
+0 2 1 8 *     roomsys  cd /opt/roomsys && /opt/roomsys/venv/bin/python manage.py open_room_census >> /var/log/roomsys/cron.log 2>&1
+
+# Nightly at 01:30: database backup.
+30 1 * * *    roomsys  /opt/roomsys/scripts/backup_db.sh >> /var/log/roomsys/backup.log 2>&1

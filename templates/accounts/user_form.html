@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Add User{% endblock %}
+{% block content %}
+  <div style="display:flex;align-items:center;margin-bottom:16px">
+    <h2 style="margin:0;font-size:18px">Add User</h2>
+    <a class="btn btn-ghost btn-sm" style="margin-left:auto" href="{% url 'accounts:user_list' %}">← Back to users</a>
+  </div>
+
+  <div class="card" style="max-width:760px">
+    <div class="card-h"><h3>New Account</h3><span class="hint">the user signs in with this username and password</span></div>
+    <div class="card-b">
+      <form method="post" action="{% url 'accounts:user_create' %}" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <ul class="messages"><li class="error">{{ form.non_field_errors|join:" " }}</li></ul>
+        {% endif %}
+        <div class="form-grid">
+          <div><label for="{{ form.username.id_for_label }}">Username</label>{{ form.username }}{{ form.username.errors }}</div>
+          <div><label for="{{ form.full_name.id_for_label }}">Full name</label>{{ form.full_name }}{{ form.full_name.errors }}</div>
+          <div class="full"><label for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}{{ form.email.errors }}</div>
+
+          <div class="full"><label for="{{ form.role.id_for_label }}">Role</label>{{ form.role }}{{ form.role.errors }}</div>
+          <div><label for="{{ form.department_name.id_for_label }}">Department</label>{{ form.department_name }}{{ form.department_name.errors }}</div>
+          <div><label for="{{ form.faculty_name.id_for_label }}">Faculty</label>{{ form.faculty_name }}{{ form.faculty_name.errors }}</div>
+          <datalist id="department-options">{% for name in form.department_options %}<option value="{{ name }}">{% endfor %}</datalist>
+          <datalist id="faculty-options">{% for name in form.faculty_options %}<option value="{{ name }}">{% endfor %}</datalist>
+          <div class="full form-help">Type the names. Departmental administrators only see rooms in their department or faculty. Leave the faculty blank to take it from an existing department; a department that is not in the system yet is added under the faculty you type.</div>
+
+          <div><label for="{{ form.password1.id_for_label }}">Password</label>{{ form.password1 }}{{ form.password1.errors }}</div>
+          <div><label for="{{ form.password2.id_for_label }}">Confirm password</label>{{ form.password2 }}{{ form.password2.errors }}</div>
+          <div class="full form-help">At least 8 characters, not only numbers, and not a common password.</div>
+
+          <div class="full form-check">{{ form.is_active }}<label for="{{ form.is_active.id_for_label }}">Account is active (can sign in)</label></div>
+
+          <div class="full" style="display:flex;gap:10px">
+            <button class="btn btn-primary" type="submit">Add user</button>
+            <a class="btn btn-ghost" href="{% url 'accounts:user_list' %}">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% load static ui_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Room Inventory &amp; Usage Monitoring System{% endblock %} · {{ INSTITUTION_NAME }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/omhare.css' %}?v=2">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=3">
+  <script defer src="{% static 'js/htmx.min.js' %}"></script>
+  <script defer src="{% static 'js/alpine.min.js' %}"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+{# Signed-in pages share the app shell (header, sidebar, layout), which omhare.css scopes to .dashboard-page #}
+<body class="{% if user.is_authenticated %}dashboard-page {% endif %}{% block body_class %}{% endblock %}">
+
+  {# ── Full-width application header ── #}
+  {% if user.is_authenticated %}
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="header-logo">
+        <img src="{% static 'img/uz-crest.png' %}" alt="University of Zimbabwe crest">
+        <div class="header-brand">
+          <div class="title">Room Inventory &amp; Usage Monitoring System</div>
+          <div class="subtitle">University of Zimbabwe</div>
+        </div>
+      </div>
+      <div class="header-user">
+        <div class="name">Welcome, {{ user.full_name|default:user.username }}</div>
+        <div class="role">{{ user.get_role_display }}</div>
+        <a class="logout-btn" href="{% url 'accounts:logout' %}">Logout</a>
+      </div>
+    </div>
+  </header>
+  {% endif %}
+
+  <div class="app">
+    {% if user.is_authenticated %}
+      {% include "partials/_sidebar.html" %}
+    {% endif %}
+
+    <div class="main">
+      <div class="content">
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </div>
+      <div class="footer">© {% now "Y" %} {{ INSTITUTION_NAME }}. All Rights Reserved.</div>
+    </div>
+  </div>
+
+  {# Room detail drawer target (filled by HTMX) #}
+  <div id="room-drawer"></div>
+
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail{% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="card-h"><h3>Audit Trail</h3>
+      <span class="hint">every change is recorded with user, time and previous → new value</span></div>
+    <div class="card-b">
+      <form method="get" style="display:flex;gap:10px">
+        <input type="search" name="action" value="{{ action }}" placeholder="Filter by action…" class="form-control" style="max-width:260px">
+        <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+      </form>
+    </div>
+    <table>
+      <thead><tr><th>Date &amp; time</th><th>User</th><th>Action</th><th>Target</th><th>Previous → New</th></tr></thead>
+      <tbody>
+        {% for e in page %}
+        <tr>
+          <td style="font-size:12px;font-weight:600">{{ e.timestamp|date:"j M, H:i" }}</td>
+          <td>{{ e.user|default:"System" }}</td>
+          <td><strong>{{ e.action }}</strong></td>
+          <td>{{ e.target }}</td>
+          <td><span style="font-size:12px">{{ e.previous_value|default:"—" }}</span>
+            → <span style="font-size:12px;color:var(--green);font-weight:700">{{ e.new_value|default:"—" }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No audit entries.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if page.paginator.num_pages > 1 %}
+    <div style="display:flex;gap:8px;padding:14px 16px;font-size:12.5px;color:var(--muted)">
+      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?page={{ page.previous_page_number }}&action={{ action }}">‹ Prev</a>{% endif %}
+        {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?page={{ page.next_page_number }}&action={{ action }}">Next ›</a>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}

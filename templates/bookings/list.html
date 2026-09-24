@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load ui_extras %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+  <div style="display:flex;align-items:center;margin-bottom:16px">
+    <h2 style="margin:0;font-size:18px">Booking Requests</h2>
+    <a class="btn btn-primary btn-sm" style="margin-left:auto" href="{% url 'bookings:create' %}">+ New request</a>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Room</th><th>Purpose / Requester</th><th>Date &amp; time</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td><strong>{{ b.room.name }}</strong><br><span style="color:var(--muted);font-size:11.5px">BK-{{ b.pk }}</span></td>
+          <td>{{ b.get_purpose_display }}<br><span style="color:var(--muted);font-size:12px">{{ b.requester_name }}</span></td>
+          <td>{{ b.date|date:"j M Y" }}<br><span style="font-weight:600;font-size:12px">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</span></td>
+          <td>{% status_pill b.status b.get_status_display %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No bookings yet.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "partials/_pager.html" with page=page %}
+  </div>
+{% endblock %}

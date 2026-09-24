@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Sign in · Room Inventory{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/login.css' %}?v=5">
+{% endblock %}
+
+{% block content %}
+<div class="login-page-shell">
+  {# Background video; drifts towards the cursor (see the script below). The
+     existing background image stays behind it as the poster and fallback. #}
+  <div class="login-bg" aria-hidden="true">
+    <video class="login-bg-video" id="loginBgVideo" autoplay muted loop playsinline
+           preload="auto" poster="{% static 'img/background.png' %}">
+      <source src="{% static 'img/dashboard.mp4' %}" type="video/mp4">
+    </video>
+    <div class="login-bg-tint"></div>
+  </div>
+
+  <div class="top-banner">
+    <div class="banner-inner">
+      <img src="{% static 'img/uz-crest.png' %}" alt="University of Zimbabwe crest" class="banner-crest">
+      <div class="banner-text">
+        <div class="banner-title">Room Inventory &amp; Usage Monitoring System</div>
+        <div class="banner-sub">University of Zimbabwe</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <main class="login-viewport">
+      <div class="login-card" role="main">
+        <img src="{% static 'img/uz-crest.png' %}" class="card-crest" alt="UZ crest">
+        <h1 class="card-title">Welcome Back</h1>
+        <p class="lead">Sign in to continue to the Room Inventory &amp; Usage Monitoring System.</p>
+
+        <form method="post" action="{% url 'accounts:login' %}" id="loginForm">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <ul class="messages"><li class="error">{{ form.non_field_errors|join:", " }}</li></ul>
+          {% endif %}
+
+          <div class="input-row">
+            <span class="input-icon" aria-hidden="true">
+              <!-- user icon -->
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 20C20 16.6863 16.4183 14 12 14C7.58172 14 4 16.6863 4 20" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            {{ form.username }}
+          </div>
+
+          <div class="input-row">
+            <span class="input-icon" aria-hidden="true">
+              <!-- lock icon -->
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="18" height="10" rx="2" stroke="#64748B" stroke-width="1.4"/><path d="M7 11V8C7 5.79086 8.79086 4 11 4C13.2091 4 15 5.79086 15 8V11" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            {{ form.password }}
+          </div>
+
+          <button type="submit" class="btn-signin" id="signInBtn">
+            <span id="signInText">Sign In</span>
+          </button>
+        </form>
+
+        <a class="forgot" href="#">Forgot Password?</a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="page-footer">© {% now "Y" %} University of Zimbabwe. All Rights Reserved.</footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Login loading overlay: shown on submit, hidden again whenever the page is (re)shown -->
+<div class="login-loader-overlay" id="loginLoader" aria-hidden="true">
+  <div class="login-loader-content">
+    <div class="dot-loader" role="status" aria-label="Signing in">
+      <span class="dot dot-1"></span>
+      <span class="dot dot-2"></span>
+      <span class="dot dot-3"></span>
+      <span class="dot dot-4"></span>
+      <span class="dot dot-5"></span>
+      <span class="dot dot-6"></span>
+      <span class="dot dot-7"></span>
+      <span class="dot dot-8"></span>
+    </div>
+    <p class="loading-title">Signing you in</p>
+    <p class="loading-subtitle">Please wait...</p>
+  </div>
+</div>
+
+<script>
+  // Background video drifts towards the cursor: a slow ease, never a jump.
+  (function () {
+    const video = document.getElementById("loginBgVideo");
+    if (!video) return;
+
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarse = window.matchMedia("(pointer: coarse)");   // phones/tablets: no cursor to follow
+    if (still.matches || coarse.matches) return;
+
+    const MAX = 26;            // pixels of travel from the centre
+    const EASE = 0.06;         // how quickly it catches up with the pointer
+    let targetX = 0, targetY = 0, x = 0, y = 0, running = false;
+
+    function frame() {
+      x += (targetX - x) * EASE;
+      y += (targetY - y) * EASE;
+      video.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px), 0)`;
+      if (Math.abs(targetX - x) > 0.1 || Math.abs(targetY - y) > 0.1) {
+        requestAnimationFrame(frame);
+      } else {
+        running = false;
+      }
+    }
+
+    window.addEventListener("pointermove", function (event) {
+      // -1 .. 1 from the middle of the window, so the move follows the cursor.
+      targetX = ((event.clientX / window.innerWidth) * 2 - 1) * MAX;
+      targetY = ((event.clientY / window.innerHeight) * 2 - 1) * MAX;
+      if (!running) {
+        running = true;
+        requestAnimationFrame(frame);
+      }
+    }, { passive: true });
+
+    // Settle back to centre when the pointer leaves the window.
+    window.addEventListener("pointerleave", function () {
+      targetX = targetY = 0;
+      if (!running) {
+        running = true;
+        requestAnimationFrame(frame);
+      }
+    });
+  })();
+
+  (function () {
+    const loginForm = document.getElementById("loginForm");
+    const loginLoader = document.getElementById("loginLoader");
+    const signInBtn = document.getElementById("signInBtn");
+    const signInText = document.getElementById("signInText");
+    if (!loginForm || !loginLoader) return;
+
+    loginForm.addEventListener("submit", function () {
+      loginLoader.classList.add("active");
+      loginLoader.setAttribute("aria-hidden", "false");
+      // Prevent accidental double submits.
+      signInBtn.disabled = true;
+      signInText.textContent = "Signing in...";
+    });
+
+    // Reset when the page is shown again (failed login reload or browser Back from cache).
+    window.addEventListener("pageshow", function (event) {
+      // Restored from the back/forward cache: its CSRF token may be stale, so fetch a fresh page.
+      if (event.persisted) {
+        window.location.reload();
+        return;
+      }
+      loginLoader.classList.remove("active");
+      loginLoader.setAttribute("aria-hidden", "true");
+      signInBtn.disabled = false;
+      signInText.textContent = "Sign In";
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% comment %}
+Scope switcher chips. Renders the scopes the user is allowed to see and links
+each to the current page with ?scope=<key>, so switching re-filters the view.
+Requires `scope` (ResolvedScope) and `available_scopes` in the context.
+{% endcomment %}
+{% if available_scopes %}
+<div class="scope-bar">
+  {% for key in available_scopes %}
+    <a href="?scope={{ key }}"
+       class="{% if scope.key == key %}active{% endif %}">
+      {% if key == 'dept' %}My Department{% elif key == 'fac' %}My Faculty{% else %}University-wide{% endif %}
+    </a>
+  {% endfor %}
+  <span class="note">Showing: <strong>{{ scope.label }}</strong></span>
+</div>
+{% endif %}

@@ -1,0 +1,11 @@
+{# Prev / Next links for a Paginator page. Usage: {% include "partials/_pager.html" with page=page %} #}
+{# {% querystring %} keeps the rest of the URL (scope, search, month) and only swaps the page number. #}
+{% if page.paginator.num_pages > 1 %}
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;font-size:12.5px;color:var(--muted)">
+  <span>Page {{ page.number }} of {{ page.paginator.num_pages }} · {{ page.paginator.count }} total</span>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="{% querystring page=page.previous_page_number %}">‹ Prev</a>{% endif %}
+    {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="{% querystring page=page.next_page_number %}">Next ›</a>{% endif %}
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,15 @@
+# ============================================================
+# systemd socket — Unix socket for Gunicorn (socket activation)
+# Install to: /etc/systemd/system/roomsys.socket
+# Then:       systemctl enable --now roomsys.socket
+# ============================================================
+[Unit]
+Description=UZ Room System socket
+
+[Socket]
+ListenStream=/run/roomsys.sock
+SocketUser=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,29 @@
+# ============================================================
+# systemd service — Gunicorn for the UZ Room System
+# Install to: /etc/systemd/system/roomsys.service
+# Then:       systemctl daemon-reload && systemctl enable --now roomsys
+# ============================================================
+[Unit]
+Description=UZ Room Inventory & Usage Monitoring System (Gunicorn)
+After=network.target postgresql.service
+Requires=roomsys.socket
+
+[Service]
+Type=notify
+User=roomsys
+Group=www-data
+WorkingDirectory=/opt/roomsys
+EnvironmentFile=/etc/roomsys/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.production
+ExecStart=/opt/roomsys/venv/bin/gunicorn \
+    --config /opt/roomsys/deploy/gunicorn.conf.py \
+    config.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=3
+# Basic hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

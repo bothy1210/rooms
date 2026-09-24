@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not permitted{% endblock %}
+{% block content %}
+<div class="card"><div class="card-b">
+  <h3 style="margin-top:0">Not permitted</h3>
+  <p style="color:var(--muted)">Only central administrators can manage users.</p>
+  <a class="btn btn-ghost" href="{% url 'dashboards:home' %}">Back to dashboard</a>
+</div></div>
+{% endblock %}

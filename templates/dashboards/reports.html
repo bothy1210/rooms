@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load ui_extras %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+
+  {% include "partials/_scope_switcher.html" %}
+
+  <div class="card">
+    <div class="card-h"><h3>Utilisation by Building</h3>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <a class="btn btn-ghost btn-sm" href="{% url 'dashboards:export_pdf' %}?scope={{ scope.key }}">Export PDF</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'dashboards:export_excel' %}?scope={{ scope.key }}">Export Excel</a>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Building</th><th>Rooms</th><th>Capacity</th><th>In use / booked</th><th>Utilisation</th></tr></thead>
+      <tbody>
+        {% for r in by_building %}
+        <tr>
+          <td><strong>{{ r.label }}</strong></td>
+          <td class="num">{{ r.rooms }}</td>
+          <td class="num">{{ r.capacity }}</td>
+          <td class="num">{{ r.used }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:9px">
+              <div class="bar-track"><div class="bar-fill" style="width:{{ r.utilisation }}%"></div></div>
+              <span style="font-weight:700;font-size:12px">{{ r.utilisation }}%</span>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty" style="padding:24px;text-align:center;color:var(--muted)">No data in this scope.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-h"><h3>Most Used Rooms</h3><span class="hint">by bookings</span></div>
+      <table>
+        <thead><tr><th>Room</th><th>Bookings</th></tr></thead>
+        <tbody>
+          {% for row in most_used %}
+          <tr><td><strong>{{ row.room.name }}</strong><br><span style="color:var(--muted);font-size:11.5px">{{ row.room.building.name }}</span></td>
+            <td class="num">{{ row.bookings }}</td></tr>
+          {% empty %}<tr><td colspan="2"><div class="empty" style="padding:20px;color:var(--muted)">No data.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Least Used Rooms</h3><span class="hint">candidates for reallocation</span></div>
+      <table>
+        <thead><tr><th>Room</th><th>Bookings</th></tr></thead>
+        <tbody>
+          {% for row in least_used %}
+          <tr><td><strong>{{ row.room.name }}</strong><br><span style="color:var(--muted);font-size:11.5px">{{ row.room.building.name }}</span></td>
+            <td class="num">{{ row.bookings }}</td></tr>
+          {% empty %}<tr><td colspan="2"><div class="empty" style="padding:20px;color:var(--muted)">No data.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% load static %}
+<aside class="sidebar">
+  <div class="sidebar-label">MENU</div>
+  <nav>
+    <a href="{% url 'dashboards:home' %}" class="{% if request.resolver_match.namespace == 'dashboards' and request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+    <a href="{% url 'rooms:inventory' %}" class="{% if request.resolver_match.namespace == 'rooms' and request.resolver_match.url_name != 'register' %}active{% endif %}">All Rooms</a>
+    <a href="{% url 'rooms:register' %}" class="{% if request.resolver_match.namespace == 'rooms' and request.resolver_match.url_name == 'register' %}active{% endif %}">Register Room</a>
+    <a href="{% url 'bookings:list' %}" class="{% if request.resolver_match.namespace == 'bookings' and request.resolver_match.url_name != 'find_venue' and request.resolver_match.url_name != 'calendar' %}active{% endif %}">Bookings</a>
+    <a href="{% url 'bookings:find_venue' %}" class="{% if request.resolver_match.url_name == 'find_venue' %}active{% endif %}">Find a Venue</a>
+    <a href="{% url 'bookings:calendar' %}" class="{% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">Calendar</a>
+    <a href="{% url 'approvals:pending' %}" class="{% if request.resolver_match.namespace == 'approvals' %}active{% endif %}">
+      Approvals
+      {% if pending_count %}<span class="badge">{{ pending_count }}</span>{% endif %}
+    </a>
+    <a href="{% url 'dashboards:reports' %}" class="{% if request.resolver_match.url_name == 'reports' %}active{% endif %}">Reports</a>
+    <a href="{% url 'notifications:list' %}" class="{% if request.resolver_match.namespace == 'notifications' %}active{% endif %}">Notifications</a>
+    <a href="{% url 'audit:trail' %}" class="{% if request.resolver_match.namespace == 'audit' %}active{% endif %}">Audit Trail</a>
+    {% if user.is_central_admin %}
+      <a href="{% url 'accounts:user_list' %}" class="{% if request.resolver_match.namespace == 'accounts' and request.resolver_match.url_name in 'user_list user_create' %}active{% endif %}">Users</a>
+    {% endif %}
+  </nav>
+</aside>

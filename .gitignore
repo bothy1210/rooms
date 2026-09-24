@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django
+*.log
+db.sqlite3
+/media/
+/staticfiles/
+/static_collected/
+
+# Environment / secrets
+.env
+/etc/roomsys/.env
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+.DS_Store

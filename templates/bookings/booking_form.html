@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}New Booking{% endblock %}
+{% block content %}
+
+  <div class="grid-2" style="grid-template-columns:1fr 1fr">
+    <div class="card">
+      <div class="card-h"><h3>New Booking Request</h3>
+        <span class="hint">availability checked live</span></div>
+      <div class="card-b">
+        <form method="post" action="{% url 'bookings:create' %}">
+          {% csrf_token %}
+          <div class="form-grid">
+            <div class="full"><label>Room requested</label>{{ form.room }}</div>
+            <div><label>Requester name</label>{{ form.requester_name }}</div>
+            <div><label>Department / office</label>{{ form.requester_dept }}</div>
+            <div class="full"><label>Purpose</label>{{ form.purpose }}</div>
+            <div><label>Expected attendance</label>{{ form.attendance }}</div>
+            <div><label>Date</label>{{ form.date }}</div>
+            <div><label>Start time</label>{{ form.start_time }}</div>
+            <div><label>End time</label>{{ form.end_time }}</div>
+            <div class="full"><label>Required equipment</label>{{ form.equipment_note }}</div>
+          </div>
+
+          {# Live availability check — posts the form to the check endpoint and
+             swaps the result into #avail without submitting the booking. #}
+          <div style="margin-top:14px">
+            <button type="button" class="btn btn-ghost"
+                    hx-post="{% url 'bookings:check' %}"
+                    hx-include="closest form"
+                    hx-target="#avail" hx-swap="innerHTML">
+              Check availability
+            </button>
+            <button type="submit" class="btn btn-primary">Submit booking request</button>
+          </div>
+          <div id="avail"></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>How booking works</h3></div>
+      <div class="card-b" style="font-size:13px;color:var(--muted);line-height:1.7">
+        <p>The system checks three things before a request can be submitted:</p>
+        <p>• <strong>Conflicts</strong> — the room must be free at that time (no double-booking).<br>
+           • <strong>Capacity</strong> — the room must seat your expected attendance.<br>
+           • <strong>Suitability</strong> — the room must be tagged for your purpose.</p>
+        <p>If any check fails, the system suggests alternative rooms that <em>are</em> free
+           and large enough — from across the whole university. Requests for rooms owned
+           by another department are routed to that department for approval.</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

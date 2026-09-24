@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load ui_extras %}
+{% block title %}Find a Venue{% endblock %}
+{% block content %}
+
+  <div class="card">
+    <div class="card-h"><h3>Find a Venue by Capacity</h3>
+      <span class="hint">searches all faculties &amp; departments — university-wide</span></div>
+    <div class="card-b">
+      {% if form.non_field_errors %}
+        <ul class="messages"><li class="error">{{ form.non_field_errors|join:" " }}</li></ul>
+      {% endif %}
+      <form method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+        <div style="flex:1;min-width:150px"><label>Expected attendance</label>{{ form.attendance }}{{ form.attendance.errors }}</div>
+        <div style="min-width:150px"><label>Purpose</label>{{ form.purpose }}{{ form.purpose.errors }}</div>
+        <div><label>Date</label>{{ form.date }}{{ form.date.errors }}</div>
+        <div><label>Start</label>{{ form.start_time }}{{ form.start_time.errors }}</div>
+        <div><label>End</label>{{ form.end_time }}{{ form.end_time.errors }}</div>
+        <div><button class="btn btn-primary" type="submit">Search venues</button></div>
+      </form>
+      <p style="margin-top:13px;font-size:12.5px;color:var(--muted)">
+        Enter how many people you need to seat. The system searches every suitable room across
+        the university, including venues owned by other faculties and departments, ranked by best fit.
+      </p>
+    </div>
+  </div>
+
+  {% if searched %}
+  <div class="card">
+    <table>
+      <thead><tr><th>Venue</th><th>Building</th><th>Owning Dept / Faculty</th><th>Capacity</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for room in venues %}
+        <tr>
+          <td><strong>{{ room.name }}</strong><br><span style="color:var(--muted);font-size:11.5px">{{ room.code }}</span></td>
+          <td>{{ room.building.name }}</td>
+          <td>{{ room.department.name }}
+            {% if room.cross_unit %}<span class="pill p-booked" style="font-size:10px">cross-unit</span>{% endif %}
+            <br><span style="color:var(--muted);font-size:11.5px">{{ room.department.faculty.name }}</span></td>
+          <td class="num">{{ room.capacity }}</td>
+          <td>{% status_pill room.status room.get_status_display %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No suitable venue found — adjust the attendance, time or date.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+{% endblock %}

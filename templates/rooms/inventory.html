@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load ui_extras %}
+{% block title %}Room Inventory{% endblock %}
+{% block content %}
+
+  {% include "partials/_scope_switcher.html" %}
+
+  <div class="card">
+    <div class="card-h"><h3>Room Inventory</h3>
+      <span class="hint">{{ page.paginator.count }} room{{ page.paginator.count|pluralize }}</span></div>
+    <div class="card-b">
+      {# ── Filters ── #}
+      <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+        <input type="hidden" name="scope" value="{{ scope.key }}">
+        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Search name, code or building…"
+               class="form-control" style="flex:1;min-width:200px">
+        <input type="number" name="min_capacity" value="{{ request.GET.min_capacity }}" placeholder="Min capacity"
+               class="form-control" style="max-width:150px">
+        <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+        <a class="btn btn-ghost btn-sm" href="{% url 'rooms:inventory' %}">Clear</a>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Code</th><th>Room</th><th>Building</th><th>Department</th><th>Type</th><th>Capacity</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for room in page %}
+        <tr class="clickable"
+            hx-get="{% url 'rooms:detail' room.pk %}"
+            hx-target="#room-drawer" hx-swap="innerHTML">
+          <td style="font-weight:700;color:var(--blue);font-size:12px">{{ room.code }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              {% if room.photo %}<img src="{{ room.photo.url }}" alt="" class="room-thumb">{% else %}<span class="room-thumb room-thumb-empty" aria-hidden="true"></span>{% endif %}
+              <strong>{{ room.name }}</strong>
+            </div>
+          </td>
+          <td>{{ room.building.name }}</td>
+          <td>{{ room.department.name }}</td>
+          <td>{{ room.room_type.name }}</td>
+          <td>{% capacity_tag room.capacity %}</td>
+          <td>{% status_pill room.status room.get_status_display %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No rooms match these filters.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {# ── Pagination ── #}
+    {% if page.paginator.num_pages > 1 %}
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;font-size:12.5px;color:var(--muted)">
+      <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        {% if page.has_previous %}
+          <a class="btn btn-ghost btn-sm" href="?scope={{ scope.key }}&q={{ request.GET.q }}&page={{ page.previous_page_number }}">‹ Prev</a>
+        {% endif %}
+        {% if page.has_next %}
+          <a class="btn btn-ghost btn-sm" href="?scope={{ scope.key }}&q={{ request.GET.q }}&page={{ page.next_page_number }}">Next ›</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+{% endblock %}

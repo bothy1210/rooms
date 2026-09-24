@@ -1,0 +1,102 @@
+/* Pixel-perfect login styles matching the provided mockup */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --uz-navy:#0B2E6B;
+  --uz-blue:#1E63F3;
+  --uz-gold:#F5A623;
+  --text-dark:#10213A;
+}
+
+html,body{height:100%;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none}
+body.login-page{margin:0;font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--text-dark);height:100vh;display:flex;flex-direction:column;background: url("../img/background.png") no-repeat center center fixed;background-size:cover;background-position:center;background-repeat:no-repeat;overflow-x:hidden;overflow-y:auto}
+
+/* Hide global chrome (base template) when on login page to avoid duplication */
+body.login-page .footer{display:none !important}
+body.login-page .omhare-header{display:none !important}
+
+/* Background exactly as provided */
+.login-page-shell{
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  width:100%;
+}
+
+/* ── Background video ───────────────────────────────────────────────
+   Sits behind everything. The layer is oversized so the cursor parallax
+   can shift it without ever exposing an edge. */
+.login-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.login-bg-video{position:absolute;top:50%;left:50%;width:112%;height:112%;
+  object-fit:cover;transform:translate3d(-50%,-50%,0);will-change:transform}
+/* Keeps the white card and the navy text readable over moving footage. */
+.login-bg-tint{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(226,235,250,.55),rgba(210,224,246,.66))}
+
+/* Container keeping header compact and centered above the card */
+.login-container{display:flex;flex-direction:column;align-items:center;gap:34px}
+.top-banner{display:flex;position:fixed;top:0;left:0;right:0;width:100%;z-index:60}
+.banner-inner{width:100%;box-sizing:border-box;background:#fff;border-radius:0;padding:14px 32px;display:flex;align-items:center;gap:18px;box-shadow:0 14px 36px rgba(15,23,42,0.08);border-bottom:3px solid var(--uz-gold);position:relative;z-index:70}
+.banner-crest{width:64px;height:auto}
+.banner-text{display:flex;flex-direction:column}
+.banner-title{font-weight:800;color:var(--uz-navy);font-size:22px}
+.banner-sub{font-size:13px;color:#6b7280}
+
+/* Card: exact dimensions and styling per spec */
+.main-content{flex:1;display:flex;align-items:center;justify-content:center;padding:112px 16px 64px;box-sizing:border-box;position:relative;z-index:10}
+.login-viewport{display:flex;align-items:center;justify-content:center;width:100%}
+.login-card{width:100%;max-width:400px;background:#fff;border-top:4px solid var(--uz-navy);border-radius:16px;padding:32px 36px;box-shadow:0 25px 70px rgba(13,44,84,0.18);box-sizing:border-box;position:relative;z-index:20}
+.card-crest{display:block;margin:0 auto 12px;width:52px;height:auto}
+.card-title{margin:0 0 8px;text-align:center;font-size:28px;line-height:1;color:var(--uz-navy);font-weight:800}
+.lead{text-align:center;margin:0 0 24px;color:#6b7280;font-size:13.5px;max-width:320px;margin-left:auto;margin-right:auto}
+
+/* Inputs */
+.input-row{position:relative;margin-bottom:16px}
+.input-row .input-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9CA3AF;z-index:1;display:flex;pointer-events:none}
+.input-row .input-icon svg{width:18px;height:18px}
+.input-row .form-control{width:100%;height:46px;padding:0 14px 0 44px;border:1px solid rgba(15,23,42,0.14);border-radius:10px;background:#fff;font-size:14px;box-sizing:border-box}
+.input-row .form-control:focus{outline:none;border-color:rgba(11,46,107,0.45);box-shadow:none}
+
+/* Button */
+.btn-signin{width:100%;height:46px;margin-top:4px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--uz-navy),#245BFF);color:#fff;font-weight:700;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.btn-signin .btn-icon{display:inline-flex;margin-right:10px;align-items:center;justify-content:center}
+.btn-signin:focus{outline:none}
+
+.forgot{display:block;text-align:center;margin-top:18px;font-size:14px;color:var(--uz-gold);font-weight:600;text-decoration:none}
+
+/* hide webkit scrollbar visuals */
+body::-webkit-scrollbar{display:none}
+
+/* Footer fixed bottom center */
+.page-footer{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;white-space:nowrap;color:#94a3b8;font-size:13px}
+
+/* Small screens: keep proportions */
+@media (max-width:520px){.login-card{padding:28px 24px}.card-title{font-size:24px}.banner-inner{padding:10px 16px}.banner-crest{width:48px}.banner-title{font-size:16px}}
+/* Short screens: tighten vertical space so the card fits; the page scrolls if it still doesn't */
+@media (max-height:700px){.main-content{padding-top:100px;padding-bottom:48px}.card-crest{width:44px;margin-bottom:8px}.lead{margin-bottom:18px}}
+
+/* Login loading overlay (shown while Django processes the sign-in) */
+.login-loader-overlay{position:fixed;inset:0;background:rgba(241,246,255,0.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease}
+.login-loader-overlay.active{opacity:1;visibility:visible;pointer-events:all}
+.login-loader-content{text-align:center}
+
+/* Circular dot loader: 8 dots around a ring with fading opacity, the ring rotates */
+.dot-loader{position:relative;width:72px;height:72px;margin:0 auto 22px;animation:loaderRotate 1.15s linear infinite}
+.dot-loader .dot{position:absolute;width:11px;height:11px;border-radius:50%;background:#155eef}
+.dot-1{top:0;left:50%;transform:translateX(-50%);opacity:1}
+.dot-2{top:10px;right:10px;opacity:.9}
+.dot-3{top:50%;right:0;transform:translateY(-50%);opacity:.8}
+.dot-4{bottom:10px;right:10px;opacity:.7}
+.dot-5{bottom:0;left:50%;transform:translateX(-50%);opacity:.6}
+.dot-6{bottom:10px;left:10px;opacity:.5}
+.dot-7{top:50%;left:0;transform:translateY(-50%);opacity:.4}
+.dot-8{top:10px;left:10px;opacity:.3}
+@keyframes loaderRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.loading-title{color:#06285f;font-size:20px;font-weight:700;margin:0 0 6px}
+.loading-subtitle{color:#667085;font-size:14px;margin:0}
+.btn-signin:disabled{opacity:.85;cursor:wait}
+
+@media (prefers-reduced-motion:reduce){.dot-loader{animation-duration:2.5s}}
+/* Someone who asked for less motion gets a still frame, not a moving one. */
+@media (prefers-reduced-motion:reduce){.login-bg-video{display:none}}

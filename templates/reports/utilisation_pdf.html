@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 2cm; }
+  body { font-family: sans-serif; color: #1E293B; font-size: 11px; }
+  h1 { color: #0E1B3D; font-size: 18px; margin-bottom: 2px; }
+  .sub { color: #64748B; font-size: 10px; margin-bottom: 18px; }
+  .band { border-bottom: 3px solid #F5A623; margin-bottom: 16px; padding-bottom: 8px; }
+  h2 { color: #0E1B3D; font-size: 13px; margin: 18px 0 6px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  th { background: #0E1B3D; color: #fff; text-align: left; padding: 6px 8px; font-size: 10px; }
+  td { padding: 5px 8px; border-bottom: 1px solid #E2E8F0; }
+  .num { text-align: right; }
+  .stat { display: inline-block; margin-right: 22px; }
+  .stat .n { font-size: 20px; font-weight: bold; color: #0E1B3D; }
+  .stat .l { font-size: 9px; color: #64748B; }
+</style>
+</head>
+<body>
+  <div class="band">
+    <h1>University of Zimbabwe — Room Utilisation Report</h1>
+    <div class="sub">Scope: {{ scope.label }} · Generated {{ generated_at|date:"j M Y, H:i" }}</div>
+  </div>
+
+  <div>
+    <div class="stat"><div class="n">{{ stats.total }}</div><div class="l">Total rooms</div></div>
+    <div class="stat"><div class="n">{{ stats.available }}</div><div class="l">Available</div></div>
+    <div class="stat"><div class="n">{{ stats.in_use }}</div><div class="l">In use</div></div>
+    <div class="stat"><div class="n">{{ stats.booked }}</div><div class="l">Booked</div></div>
+    <div class="stat"><div class="n">{{ stats.unavailable }}</div><div class="l">Unavailable</div></div>
+    <div class="stat"><div class="n">{{ stats.utilisation }}%</div><div class="l">Utilisation</div></div>
+  </div>
+
+  <h2>Utilisation by Building</h2>
+  <table>
+    <thead><tr><th>Building</th><th class="num">Rooms</th><th class="num">Capacity</th><th class="num">In use / booked</th><th class="num">Utilisation %</th></tr></thead>
+    <tbody>
+      {% for r in by_building %}
+      <tr><td>{{ r.label }}</td><td class="num">{{ r.rooms }}</td><td class="num">{{ r.capacity }}</td><td class="num">{{ r.used }}</td><td class="num">{{ r.utilisation }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Utilisation by Department</h2>
+  <table>
+    <thead><tr><th>Department</th><th class="num">Rooms</th><th class="num">Capacity</th><th class="num">Utilisation %</th></tr></thead>
+    <tbody>
+      {% for r in by_department %}
+      <tr><td>{{ r.label }}</td><td class="num">{{ r.rooms }}</td><td class="num">{{ r.capacity }}</td><td class="num">{{ r.utilisation }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load ui_extras %}
+{% block title %}Usage History{% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="card-h"><h3>Usage History — {{ room.name }}</h3>
+      <span class="hint">{{ room.code }}</span></div>
+    <table>
+      <thead><tr><th>When</th><th>Status</th><th>Changed by</th><th>Note</th></tr></thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td style="font-size:12px;font-weight:600">{{ log.timestamp|date:"j M Y, H:i" }}</td>
+          <td>{% status_pill log.status log.get_status_display %}</td>
+          <td>{{ log.changed_by|default:"System" }}</td>
+          <td>{{ log.note|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No usage history recorded.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

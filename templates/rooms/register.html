@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Register Room{% endblock %}
+{% block content %}
+
+  <div class="grid-2" style="grid-template-columns:.9fr 1.1fr">
+    {# ── Registration form ── #}
+    <div class="card">
+      <div class="card-h"><h3>Register a New Room</h3></div>
+      <div class="card-b">
+        <div style="display:flex;gap:0;flex-wrap:wrap;margin-bottom:16px;font-size:11.5px">
+          <span style="background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue);padding:7px 12px;border-radius:8px 0 0 8px;font-weight:700">1. Submit (Draft)</span>
+          <span style="background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue);padding:7px 12px;font-weight:700">2. Verify</span>
+          <span style="background:var(--bg);color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:0 8px 8px 0;font-weight:700">3. Official code → bookable</span>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:0">
+          Rooms enter as <strong>Drafts</strong> and become bookable only after central
+          administration verifies them and the system issues an official code.
+        </p>
+        <form method="post" action="{% url 'rooms:register' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-grid">
+            {% if form.non_field_errors %}
+              <div class="full"><ul class="messages"><li class="error">{{ form.non_field_errors|join:" " }}</li></ul></div>
+            {% endif %}
+            <div class="full"><label for="{{ form.name.id_for_label }}">Room name / number</label>{{ form.name }}{{ form.name.errors }}</div>
+            <div><label for="{{ form.building_name.id_for_label }}">Building</label>{{ form.building_name }}{{ form.building_name.errors }}</div>
+            <div><label for="{{ form.floor_name.id_for_label }}">Floor</label>{{ form.floor_name }}{{ form.floor_name.errors }}</div>
+            <div><label for="{{ form.room_type_name.id_for_label }}">Room type</label>{{ form.room_type_name }}{{ form.room_type_name.errors }}</div>
+            <div><label for="{{ form.capacity.id_for_label }}">Seating capacity</label>{{ form.capacity }}{{ form.capacity.errors }}</div>
+            <div><label for="{{ form.department_name.id_for_label }}">Owning department / office</label>{{ form.department_name }}{{ form.department_name.errors }}</div>
+            <div><label for="{{ form.faculty_name.id_for_label }}">Faculty</label>{{ form.faculty_name }}{{ form.faculty_name.errors }}</div>
+            <div class="full form-help">Type the names; existing ones are suggested as you type. Anything new is added when you submit. The faculty is only needed for a department that is not in the system yet.</div>
+            <div class="full"><label for="{{ form.accessibility.id_for_label }}">Accessibility</label>{{ form.accessibility }}{{ form.accessibility.errors }}</div>
+            <div class="full"><label for="{{ form.photo.id_for_label }}">Photo of the room</label>{{ form.photo }}{{ form.photo.errors }}
+              <div class="form-help">Optional. JPEG, PNG or WebP, up to 5 MB. It stays with the room once verified.</div></div>
+            <datalist id="building-options">{% for n in form.building_options %}<option value="{{ n }}">{% endfor %}</datalist>
+            <datalist id="floor-options">{% for n in form.floor_options %}<option value="{{ n }}">{% endfor %}</datalist>
+            <datalist id="room-type-options">{% for n in form.room_type_options %}<option value="{{ n }}">{% endfor %}</datalist>
+            <datalist id="department-options">{% for n in form.department_options %}<option value="{{ n }}">{% endfor %}</datalist>
+            <datalist id="faculty-options">{% for n in form.faculty_options %}<option value="{{ n }}">{% endfor %}</datalist>
+            <div class="full">
+              <button class="btn btn-primary" type="submit">Submit for verification</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {# ── Verification queue ── #}
+    <div class="card">
+      <div class="card-h"><h3>Rooms Awaiting Verification</h3>
+        <span class="hint">not bookable until verified</span></div>
+      <table>
+        <thead><tr><th>Room (Draft)</th><th>Location</th><th>Type</th><th>Capacity</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for d in pending %}
+          <tr>
+            <td>
+              {% if d.photo %}<a href="{{ d.photo.url }}" target="_blank" rel="noopener"><img src="{{ d.photo.url }}" alt="Photo of {{ d.name }}" class="room-thumb" style="margin-bottom:6px"></a><br>{% endif %}
+              <strong>{{ d.name }}</strong> <span class="pill p-pending">Draft</span><br>
+              <span style="color:var(--muted);font-size:11.5px">{{ d.department.name }}</span></td>
+            <td>{{ d.building.name }}<br><span style="color:var(--muted);font-size:11.5px">{{ d.floor.name }} floor</span></td>
+            <td>{{ d.room_type.name }}</td>
+            <td class="num">{{ d.capacity }}</td>
+            <td>
+              {% if can_verify %}
+                <form method="post" action="{% url 'rooms:verify' d.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-green btn-sm" type="submit">Verify &amp; issue code</button>
+                </form>
+              {% else %}
+                <span style="font-size:11.5px;background:#E2E8F0;color:var(--muted);padding:4px 11px;border-radius:99px;font-weight:600">🔒 central admin verifies</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5"><div class="empty" style="padding:30px;text-align:center;color:var(--muted)">No rooms awaiting verification.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}

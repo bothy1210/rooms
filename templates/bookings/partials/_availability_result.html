@@ -1,0 +1,36 @@
+{% if form_errors %}
+  <div class="availability bad">Please complete the form correctly, then check again.</div>
+{% elif result.ok %}
+  <div class="availability good">
+    ✔ <strong>{{ room.name }}</strong> is available for the requested slot
+    {% if result.room_capacity %}(capacity {{ result.room_capacity }}){% endif %}. You may submit the request.
+  </div>
+{% else %}
+  <div class="availability bad">
+    {% if result.conflict %}
+      <div><strong>⚠ Double-booking prevented.</strong> {{ room.name }} is already
+        {{ result.conflict.get_status_display|lower }} from
+        {{ result.conflict.start_time|time:"H:i" }}–{{ result.conflict.end_time|time:"H:i" }}
+        ({{ result.conflict.get_purpose_display }}).</div>
+    {% endif %}
+    {% if result.capacity_exceeded %}
+      <div><strong>⚠ Capacity exceeded.</strong> Expected attendance is above this room's
+        capacity ({{ result.room_capacity }}).</div>
+    {% endif %}
+    {% if result.unsuitable %}
+      <div><strong>⚠ Not suitable.</strong> This room is not registered for
+        {{ result.required_tag }}.</div>
+    {% endif %}
+
+    {% if result.alternatives %}
+      <div class="alt">
+        <span style="width:100%;font-size:12.5px">Suggested alternatives free at that time:</span>
+        {% for alt in result.alternatives %}
+          <span style="font-weight:600">{{ alt.name }} · cap {{ alt.capacity }} · {{ alt.department.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="margin-top:8px">No alternative rooms meet the requirement at that time.</div>
+    {% endif %}
+  </div>
+{% endif %}

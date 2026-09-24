@@ -1,0 +1,111 @@
+/* ============================================================
+   app.css — reusable UI components (stat cards, pills, tables,
+   room drawer, availability box, calendar) used across the app.
+   ============================================================ */
+
+/* ── Stat cards ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+      box-shadow:var(--shadow);display:flex;gap:14px;align-items:center}
+.stat .ic{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.stat .s-lbl{font-size:12.5px;color:var(--muted);font-weight:600}
+.stat .s-num{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.stat .s-sub{font-size:11.5px;color:var(--muted)}
+.ic-blue{background:var(--blue-soft);color:var(--blue)}
+.ic-green{background:var(--green-soft);color:var(--green)}
+.ic-amber{background:var(--amber-soft);color:var(--amber)}
+.ic-purple{background:var(--purple-soft);color:var(--purple)}
+.ic-red{background:var(--red-soft);color:var(--red)}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.card-h h3{font-size:14.5px;font-weight:700;margin:0}
+.card-h .hint,.card-h .link{margin-left:auto;font-size:12px;color:var(--muted)}
+.card-b{padding:16px 18px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+/* ── Pills (status) ── */
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap}
+.p-available{background:var(--green-soft);color:var(--green)}
+.p-inuse{background:var(--amber-soft);color:#B45309}
+.p-booked{background:var(--purple-soft);color:#6D28D9}
+.p-unavail{background:var(--red-soft);color:var(--red)}
+.p-pending{background:var(--amber-soft);color:#B45309}
+.p-approved{background:var(--green-soft);color:var(--green)}
+.p-rejected{background:var(--red-soft);color:var(--red)}
+.p-cancelled{background:#E2E8F0;color:var(--muted)}
+.cap-tag{font-family:ui-monospace,monospace;font-size:11.5px;background:#E2E8F0;padding:2px 8px;border-radius:6px}
+.suit-tag{font-size:10.5px;font-weight:700;background:var(--blue-soft);color:var(--blue);padding:2px 8px;border-radius:99px;margin-right:4px;display:inline-block}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);
+   font-weight:700;padding:10px 16px;border-bottom:1px solid var(--line);background:#F8FAFC}
+td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:#F8FAFC}
+.num{font-weight:700}
+
+/* ── Forms & buttons ── */
+.form-control,.form-select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#FBFDFF;font-size:13.5px}
+.form-control:focus,.form-select:focus{outline:2px solid var(--blue);outline-offset:1px}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.form-grid .full{grid-column:1/-1}
+.errorlist{list-style:none;margin:5px 0 0;padding:0;color:#B91C1C;font-size:12px;font-weight:500}
+.form-help{font-size:12px;color:var(--muted);margin-top:-4px}
+.form-check{display:flex;align-items:center;gap:8px}
+.form-check label{margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)}
+@media(max-width:720px){.form-grid{grid-template-columns:1fr}}
+/* Room photos: a thumbnail beside a room name, the full picture in the detail drawer */
+.room-thumb{width:44px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex-shrink:0;display:inline-block}
+.room-thumb-empty{background:repeating-linear-gradient(45deg,var(--bg),var(--bg) 4px,var(--card) 4px,var(--card) 8px)}
+.room-photo{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin-bottom:16px}
+.btn{border:0;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{filter:brightness(1.07);text-decoration:none}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-ghost{background:var(--card);border:1px solid var(--line);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* ── Availability / conflict box ── */
+.availability{border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.55;margin:12px 0}
+.availability.good{background:var(--green-soft);border:1px solid #86EFAC;color:#166534}
+.availability.bad{background:var(--red-soft);border:1px solid #FCA5A5;color:#991B1B}
+.availability .alt{margin-top:9px;display:flex;flex-wrap:wrap;gap:7px}
+.availability .alt a{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:600}
+
+/* ── Messages ── */
+.messages{list-style:none;padding:0;margin:0 0 16px}
+.messages li{padding:11px 15px;border-radius:9px;margin-bottom:8px;font-size:13px;font-weight:500}
+.messages li.success{background:var(--green-soft);color:#166534}
+.messages li.error{background:var(--red-soft);color:#991B1B}
+.messages li.info{background:var(--blue-soft);color:#1E40AF}
+
+/* ── Room drawer (HTMX-loaded) ── */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(14,27,61,.4);z-index:60}
+.drawer{position:fixed;top:0;right:0;width:450px;max-width:95vw;height:100vh;background:var(--card);
+        z-index:70;box-shadow:-10px 0 34px rgba(14,27,61,.22);display:flex;flex-direction:column;overflow-y:auto}
+.drawer .d-head{padding:18px 20px;background:var(--navy);color:#fff}
+.drawer .d-head .code{font-size:11px;color:#93C5FD;letter-spacing:1.2px;font-weight:700}
+.drawer .d-head h3{margin:3px 0 0;font-size:18px}
+.drawer .d-body{padding:18px 20px}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;margin-bottom:16px}
+.spec .sk{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.spec .sv{font-size:13px;font-weight:600;margin-top:2px}
+.locked-note{font-size:12.5px;color:#991B1B;background:var(--red-soft);padding:10px 13px;border-radius:9px}
+
+/* ── Mini calendar ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-grid .dow{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding:6px 0}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12.5px;font-weight:600;position:relative}
+.cal-day.today{background:var(--blue);color:#fff}
+.cal-day .dot{position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:var(--purple)}
+
+/* ── Utilisation bars ── */
+.bar-track{height:9px;background:#E2E8F0;border-radius:99px;overflow:hidden;max-width:160px}
+.bar-fill{height:100%;background:var(--blue);border-radius:99px}
