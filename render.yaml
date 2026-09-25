@@ -1,0 +1,30 @@
+# Render Blueprint — UZ Room System web service.
+# Secrets marked `sync: false` are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: roomsys
+    runtime: python
+    region: frankfurt          # closest Render region to the Supabase eu-west-2 database
+    plan: free
+    buildCommand: ./build.sh
+    # Few workers: the Supabase session pooler caps concurrent connections.
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 60 --access-logfile -
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_HOSTS
+        value: localhost
+      - key: LOG_FILE
+        value: /tmp/roomsys.log
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false

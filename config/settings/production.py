@@ -3,6 +3,12 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = False
 
+# Render sets its public hostname (e.g. roomsys.onrender.com) in the environment.
+RENDER_EXTERNAL_HOSTNAME = env("RENDER_EXTERNAL_HOSTNAME", default="")  # noqa: F405
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)  # noqa: F405
+    CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_EXTERNAL_HOSTNAME}"]
+
 # ── SMTP email (credentials from .env) ─────────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = env("EMAIL_HOST", default="smtp.uz.ac.zw")  # noqa: F405
