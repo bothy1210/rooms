@@ -87,6 +87,9 @@ class Room(TimeStampedModel):
     condition = models.CharField(max_length=20, default="Good")
     accessibility = models.CharField(max_length=60, blank=True)
     status = models.CharField(max_length=20, choices=RoomStatus.choices, default=RoomStatus.AVAILABLE)
+    # When a person last set Available / Booked / In use by hand. The diary
+    # refresh leaves that choice alone until the next booking starts or ends.
+    status_set_at = models.DateTimeField(null=True, blank=True)
     photo = models.ImageField(upload_to="rooms/", blank=True, null=True)
     remarks = models.TextField(blank=True)
 

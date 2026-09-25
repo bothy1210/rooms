@@ -7,6 +7,7 @@ duplicates, no ghost rooms, consistent codes). Business rules live here, never
 in views, so they can be reused by the API and tested in isolation.
 """
 from collections import defaultdict
+from datetime import datetime
 
 from django.conf import settings
 from django.core.cache import cache
@@ -129,7 +130,9 @@ class RoomStatusService:
             raise RoomRegistrationError(f"Unknown status '{new_status}'.")
         old = room.status
         room.status = new_status
-        room.save(update_fields=["status", "updated_at"])
+        # A hand-set diary status is kept until the diary next moves on.
+        room.status_set_at = timezone.now() if new_status in RoomStatusService.AUTO_STATUSES else None
+        room.save(update_fields=["status", "status_set_at", "updated_at"])
         return old, new_status
 
     # Statuses the system maintains from the booking diary. The others
@@ -147,6 +150,18 @@ class RoomStatusService:
         if any(b.date == today and b.start_time > clock for b in bookings):
             return RoomStatus.BOOKED
         return RoomStatus.AVAILABLE
+
+    @staticmethod
+    def last_diary_change(bookings):
+        """The latest moment today a booking started or ended (midnight if none yet)."""
+        now = timezone.localtime()
+        midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        moments = [
+            timezone.make_aware(datetime.combine(b.date, t), now.tzinfo)
+            for b in bookings for t in (b.start_time, b.end_time)
+            if b.date == now.date()
+        ]
+        return max([m for m in moments if m <= now] + [midnight])
 
     @classmethod
     @transaction.atomic
@@ -169,7 +184,11 @@ class RoomStatusService:
 
         changed = 0
         for room in Room.objects.filter(status__in=cls.AUTO_STATUSES):
-            wanted = cls.status_from_diary(room, by_room.get(room.pk, ()))
+            bookings = by_room.get(room.pk, ())
+            # Respect a status someone set by hand since the diary last changed.
+            if room.status_set_at and room.status_set_at >= cls.last_diary_change(bookings):
+                continue
+            wanted = cls.status_from_diary(room, bookings)
             if wanted != room.status:
                 room.status = wanted
                 room.save(update_fields=["status", "updated_at"])   # signals keep the dashboard in step
